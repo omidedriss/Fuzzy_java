@@ -1,0 +1,57 @@
+/*
+     creat BMI app 
+
+	
+
+									omid edriss
+									
+*/
+FUNCTION_BLOCK BMI	// Block definition
+
+VAR_INPUT				// Define input variables
+	hight : REAL;
+	Weight : REAL;
+END_VAR
+VAR_OUTPUT				// Define output variable
+	BMI : REAL;
+END_VAR
+
+FUZZIFY hight			// Fuzzify input variable 'hight': {'short', 'normal' , 'tall'} ---- cm
+	TERM short := (0, 1) (140, 1) (150, 0) ; 
+	TERM normal := (140, 0) (160,1) (170,1) (180,0);
+	TERM tall := (170, 0) (190, 1);
+END_FUZZIFY
+
+FUZZIFY Weight			// Fuzzify input variable 'Weight': {'underweight', 'normal' , 'high'} ---- kg
+	TERM underweight := (0, 1) (50, 1) (55, 0) ; 
+	TERM normal_w := (50, 0) (60,1) (65,1) (70,0);
+	TERM high := (65, 0) (70, 1);
+END_FUZZIFY
+
+DEFUZZIFY BMI			// Defzzzify output variable 'BMI' : {'thin', 'normal', 'fat' }
+	TERM thin := (0,1) (18.5,1) (20,0);
+	TERM normal_B := (18.5,0) (20,1) (23,1) (25,0);
+	TERM fat := (23,0) (25,1) (35,1);
+	METHOD : COG;		// Use 'Center Of Gravity' defuzzification method
+	DEFAULT := 0;		// Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+RULEBLOCK No1
+	AND : MIN;			// Use 'min' for 'and' (also implicit use 'max' for 'or' to fulfill DeMorgan's Law)
+	ACT : MIN;			// Use 'min' activation method
+	ACCU : MAX;			// Use 'max' accumulation method
+
+	RULE 1 : IF hight IS short AND Weight IS underweight THEN BMI IS thin;
+	RULE 2 : IF hight IS short AND Weight IS normal_w THEN BMI IS normal_B;
+	RULE 3 : IF hight IS short AND Weight IS high THEN BMI IS fat;
+	RULE 4 : IF hight IS normal AND Weight IS underweight THEN BMI IS normal_B;
+	RULE 5 : IF hight IS normal AND Weight IS high THEN BMI IS fat;
+	RULE 5 : IF hight IS normal AND Weight IS normal_w THEN BMI IS normal_B;
+	RULE 6 : IF hight IS tall AND Weight IS underweight THEN BMI IS thin;
+	RULE 7 : IF hight IS tall AND Weight IS normal_w THEN BMI IS normal_B;
+	RULE 7 : IF hight IS tall AND Weight IS high THEN BMI IS normal_B;
+	
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+

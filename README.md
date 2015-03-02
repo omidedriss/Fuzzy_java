@@ -1,4 +1,4 @@
 Fuzzy_java
 ==========
 
-Sample code for jfuzzy 
+Bady mass index (BMI) implement with java
